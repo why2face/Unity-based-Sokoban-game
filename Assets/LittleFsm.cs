@@ -32,7 +32,8 @@ public class LittleFsm<T> where T : struct
 
     public void UpdateState(float delta)
     {
-        if (this.m_StateFunc.ContainsKey(this.m_CurState) && (this.m_StateFunc[this.m_CurState].updateFunc != null))
+        if (this.m_StateFunc.ContainsKey(this.m_CurState) 
+            && (this.m_StateFunc[this.m_CurState].updateFunc != null) )
         {
             this.m_StateFunc[this.m_CurState].updateFunc(delta);
         }
@@ -48,13 +49,16 @@ public class LittleFsm<T> where T : struct
 
         if (this.m_StateFunc.ContainsKey(curState) && (this.m_StateFunc[curState].exitFunc) != null)
         {
+            //退出当前状态
             this.m_StateFunc[curState].exitFunc();
         }
 
         if (this.m_StateFunc.ContainsKey(this.m_CurState) && (this.m_StateFunc[this.m_CurState].enterFunc) != null)
         {
+            //进入下一状态
             this.m_StateFunc[this.m_CurState].enterFunc(param);
         }
+        //状态时间归零
         this.m_StateTimer = 0f;
 
     }

@@ -1,9 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public enum PlayerState { Idle, Walking, Pushing };
 
 public class PlayerMove : MonoBehaviour {
+
+    private Vector3 endpos;
+    private Transform t;
 
     private CharacterController cc;
     public float speed = 4;
@@ -19,6 +23,7 @@ public class PlayerMove : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        t = GetComponent<Transform>();
         cc = GetComponent<CharacterController>();
         box = GameObject.FindGameObjectsWithTag("box");
         destination = GameObject.FindGameObjectsWithTag("Finish");
@@ -26,10 +31,7 @@ public class PlayerMove : MonoBehaviour {
         destNum = destination.Length;
         score = 0;
         //判断
-        if (score < destNum)
-            InvokeRepeating("judgeWin",2,2);
-        //移动
-      //  this.StartCoroutine(moveStep());
+        InvokeRepeating("judgeWin", 2, 2);
 
         pFsm.RegistState(PlayerState.Idle, OnIdleEnter, OnIdleUpdate, OnIdleExit);
         pFsm.RegistState(PlayerState.Walking, OnWalkingEnter, OnWalkingUpdate, OnWalkingExit);
@@ -42,58 +44,26 @@ public class PlayerMove : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-        if (Input.GetKeyDown(KeyCode.W)||
-            Input.GetKeyDown(KeyCode.S)||
-            Input.GetKeyDown(KeyCode.A)||
-            Input.GetKeyDown(KeyCode.D)) {
-            pFsm.SetState(PlayerState.Walking);
-        }
-        if (Input.GetKeyUp(KeyCode.W) ||
-            Input.GetKeyUp(KeyCode.S) ||
-            Input.GetKeyUp(KeyCode.A) ||
-            Input.GetKeyUp(KeyCode.D))
-        {
-            pFsm.SetState(PlayerState.Idle);
-        }
+
+        pFsm.UpdateState(Time.deltaTime);
         if (cc.collisionFlags != 0) {
             pFsm.SetState(PlayerState.Pushing);
         }
-    }
+        else if (Input.GetKeyDown(KeyCode.W) ||
+                 Input.GetKeyDown(KeyCode.S) ||
+                 Input.GetKeyDown(KeyCode.A) ||
+                 Input.GetKeyDown(KeyCode.D) )
+            {
+              pFsm.SetState(PlayerState.Walking);     
+            }
 
-    IEnumerator moveStep() {
-        while (true)
-        {
-        //step1     
-        
-        //获取位移方向
-        float h = Input.GetAxis("Horizontal");
-        float v = Input.GetAxis("Vertical");
-        if (Mathf.Abs(h) > 0.1f || Mathf.Abs(v) > 0.1)
-        {
-            Vector3 targetDir = new Vector3(h, 0, v);
-            //让目标旋转到获取到的方向
-            transform.LookAt(targetDir + transform.position);
-            //移动
-            cc.SimpleMove(targetDir * speed);
-
-        }
-        yield return null;
-        }
-        
     }
 
     //控制碰撞
     public float pushPower = 2.0F;
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        Rigidbody body = hit.collider.attachedRigidbody;
-        if (body == null || body.isKinematic)
-           return;
-        if (hit.moveDirection.y < -0.3F)
-            return;
-      //push
-        Vector3 pushDir = new Vector3(hit.moveDirection.x, 0, hit.moveDirection.z);
-         body.velocity = pushDir * pushPower;
+        Debug.Log("Colliding !");
     }
 
     //得分判断
@@ -109,27 +79,41 @@ public class PlayerMove : MonoBehaviour {
             }          
         }
         Debug.Log("score: " + score);
-        if (score == destNum) Debug.Log("you win");
+        if (score == boxNum) Debug.Log("you win");
     }
     
     void OnIdleEnter(object param) { Debug.Log("Player enter Idle"); }
-    void OnIdleUpdate(float delta) { }
+    void OnIdleUpdate(float delta) {  }
     void OnIdleExit() { Debug.Log("Player exit Idle "); }
 
     void OnWalkingEnter(object param) {
         Debug.Log("Player enter Walking");
-        //获取位移方向
-         Vector3 targetDir = new Vector3(0, 0, 1);
-        //让目标旋转到获取到的方向
-         transform.LookAt(targetDir + transform.position);
-        //移动
-         cc.SimpleMove(targetDir * speed);
-        
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+                endpos = new Vector3(t.transform.position.x, t.transform.position.y, t.transform.position.z + 1);
+        }
+        else if (Input.GetKeyDown(KeyCode.S))
+        {
+                endpos = new Vector3(t.transform.position.x, t.transform.position.y, t.transform.position.z - 1);
+        }
+        else if (Input.GetKeyDown(KeyCode.D))
+        {
+                endpos = new Vector3(t.transform.position.x + 1, t.transform.position.y, t.transform.position.z);
+        }
+        else if (Input.GetKeyDown(KeyCode.A))
+        {
+                endpos = new Vector3(t.transform.position.x - 1, t.transform.position.y, t.transform.position.z);
+        }
     }
-    void OnWalkingUpdate(float delta) { }
-    void OnWalkingExit() { }
+    void OnWalkingUpdate(float delta) {
+       Debug.Log("Player update walking");
+        if (pFsm.m_StateTimer < 1)
+            t.transform.position = Vector3.Lerp(t.transform.position, endpos, pFsm.m_StateTimer);
+        else pFsm.SetState(PlayerState.Idle);
+    }
+    void OnWalkingExit() { Debug.Log("Player Exit Walking"); }
 
-    void OnPushingEnter(object param) { }
+    void OnPushingEnter(object param) { Debug.Log("Player Enter Pushing"); }
     void OnPushingUpdate(float delta) { }
     void OnPushingExit() { }
 
