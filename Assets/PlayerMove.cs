@@ -2,7 +2,6 @@
 using System.Collections;
 using System;
 
-public enum PlayerState { Idle, Walking, Pushing };
 
 public class PlayerMove : MonoBehaviour {
 
@@ -18,6 +17,7 @@ public class PlayerMove : MonoBehaviour {
     GameObject[] box;
     GameObject[] destination;
 
+    //Player状态机
     public enum PlayerState { Idle, Walking, Pushing };
     LittleFsm<PlayerState> pFsm = new LittleFsm<PlayerState>();
 
@@ -60,11 +60,16 @@ public class PlayerMove : MonoBehaviour {
     }
 
     //控制碰撞
-    public float pushPower = 2.0F;
-    void OnControllerColliderHit(ControllerColliderHit hit)
-    {
-        Debug.Log("Colliding !");
+  //  void OnControllerColliderHit(ControllerColliderHit hit)
+//    {
+ //       GameObject collideObj = hit.gameObject;
+ //       Debug.Log("Colliding with : "+collideObj.name);
+ //   }
+    void OnTriggerEnter(Collider c) {
+  //      Debug.Log("Colliding with : " + c.name);
+  //      c.GetComponent<BoxMove>().bFsm.SetState(BoxMove.BoxState.PushAble);
     }
+
 
     //得分判断
     public void judgeWin() {
@@ -78,7 +83,7 @@ public class PlayerMove : MonoBehaviour {
                       score++;             
             }          
         }
-        Debug.Log("score: " + score);
+      //  Debug.Log("score: " + score);
         if (score == boxNum) Debug.Log("you win");
     }
     
@@ -106,7 +111,7 @@ public class PlayerMove : MonoBehaviour {
         }
     }
     void OnWalkingUpdate(float delta) {
-       Debug.Log("Player update walking");
+      // Debug.Log("Player update walking");
         if (pFsm.m_StateTimer < 1)
             t.transform.position = Vector3.Lerp(t.transform.position, endpos, pFsm.m_StateTimer);
         else pFsm.SetState(PlayerState.Idle);
