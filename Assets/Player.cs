@@ -22,7 +22,7 @@ public class Player : MonoBehaviour {
 	
 	}
     void OnIdleEnter(object param) { Debug.Log("Player enter Idle"); }
-    void OnIdleExit() { Debug.Log("Player exit Idle "); }
+    void OnIdleExit() { }
 
     void OnWalkingEnter(object param)
     {
@@ -46,10 +46,17 @@ public class Player : MonoBehaviour {
     }
     void OnWalkingUpdate(float delta)
     {
-        //移动时间设置为1，时间增量为delta
-        if (pFsm.m_StateTimer < 1)
+        //移动时间设置，时间增量为delta
+        if (pFsm.m_StateTimer < 0.8f)
             this.transform.position = Vector3.Lerp(this.transform.position, endpos, pFsm.m_StateTimer);
-        else pFsm.SetState(PlayerState.Idle);
+        else  pFsm.SetState(PlayerState.Idle);
     }
-    void OnWalkingExit() { Debug.Log("Player Exit Walking"); }
+    void OnWalkingExit() {
+        this.GetComponentInParent<GameModel>().playerX = (int)this.transform.position.x;
+        this.GetComponentInParent<GameModel>().playerZ = (int)this.transform.position.z;
+        //调整坐标为整数
+        transform.position = new Vector3(this.GetComponentInParent<GameModel>().playerX,
+            this.transform.position.y,this.GetComponentInParent<GameModel>().playerZ);
+
+    }
 }
