@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 
 public class GameModel : MonoBehaviour {
 
@@ -26,14 +24,15 @@ public class GameModel : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
-	}
+
+    }
+
     /// <summary>
     /// 加载箱子、目标点坐标
     /// </summary>
     void loadPosition() {
         isTarget = new bool[, ]
-        { { false,false,true,false,false},
+        { { false,false,false,false,true},
           { false, false, false, false, false},
           { false,false,false,false,true},
           { false, false, false, false, false},
@@ -45,13 +44,13 @@ public class GameModel : MonoBehaviour {
           {false,false,false,true,false },
           {false,false,false,false,false}};
     }
+
     /// <summary>
     /// 初始化关卡
     /// 数组[i,j]对应坐标：( j, chessWidth-1-i )
     /// 坐标(x,z)对应数组：[ chessWidth-1-z , x ]
     /// </summary>
     public void setStage() {
-
         loadPosition();
         //设置地板 
         for (int i = 0; i < chessLength; i++)

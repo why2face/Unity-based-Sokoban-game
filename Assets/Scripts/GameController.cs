@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.UI;
 
 public class GameController : MonoBehaviour {
@@ -37,12 +36,6 @@ public class GameController : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-        //玩家状态机update()
-        player.GetComponent<Player>().pFsm.UpdateState(Time.deltaTime);
-        //箱子状态机update()
-        if (boxToMove != null)
-            boxToMove.GetComponent<Box>().bFsm.UpdateState(Time.deltaTime);
-
         getInput();
     }
     //输入控制
@@ -147,19 +140,21 @@ public class GameController : MonoBehaviour {
             msg = "D";
             if (player.transform.position.x + 1 < chessLength)
             {
-                //判断该方向上是否与箱子相邻
+                //判断该方向上是否与box相邻
                 if (boxPos[(int)(chessWidth - 1 - player.transform.position.z), (int)(player.transform.position.x + 1)])
                 {
-                    //相邻，判断箱子是否能推动
+                    //相邻，判断box是否能推动
                     if (player.transform.position.x + 2 < chessLength)
                         if (!(boxPos[(int)(chessWidth - player.transform.position.z - 1), (int)(player.transform.position.x + 2)]))
                         {
-                            //可推动
+                            //box可推动
                             RaycastHit hit;
                             if (Physics.Raycast(player.transform.position, Vector3.right, out hit, 1))
                             {
                                 boxToMove = hit.collider.gameObject;
+                                //玩家移动
                                 player.GetComponent<Player>().pFsm.SetState(Player.PlayerState.Walking, msg);
+                                //box移动
                                 boxToMove.GetComponent<Box>().bFsm.SetState(Box.BoxState.Moving, msg);
                                 boxPos[(int)(chessWidth - player.transform.position.z - 1), (int)(player.transform.position.x + 1)] = false;
                                 boxPos[(int)(chessWidth - player.transform.position.z - 1), (int)(player.transform.position.x + 2)] = true;
@@ -168,7 +163,7 @@ public class GameController : MonoBehaviour {
                 }
                 else
                 {
-                    //不相邻，直接移动
+                    //不相邻or不在边界，玩家移动
                     player.GetComponent<Player>().pFsm.SetState(Player.PlayerState.Walking, msg);
                 }
             }
@@ -187,8 +182,8 @@ public class GameController : MonoBehaviour {
                   && b.transform.position.z < d.transform.position.z + 0.5)
                     score++;
             }
-        //  Debug.Log("score: " + score);
-        textUI.GetComponent<Text>().text = "Score: "+score;
-        if (score == boxGroup.Length) textUI.GetComponent<Text>().text= "Score: " + score+"\n YOU WIN";
+        textUI.GetComponent<Text>().text = "Box Num:  "+boxGroup.Length+"\nScore:  "+score;
+        if (score == boxGroup.Length)
+            textUI.GetComponent<Text>().text = textUI.GetComponent<Text>().text+ "\n (￣3￣) YOU WIN";
     }
 }

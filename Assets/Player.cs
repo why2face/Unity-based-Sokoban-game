@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System;
+using UnityEngine;
 
 public class Player : MonoBehaviour {
     
@@ -19,8 +19,8 @@ public class Player : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
-	}
+        pFsm.UpdateState(3 * Time.deltaTime);
+    }
     void OnIdleEnter(object param) { Debug.Log("Player enter Idle"); }
     void OnIdleExit() { }
 
@@ -47,16 +47,15 @@ public class Player : MonoBehaviour {
     void OnWalkingUpdate(float delta)
     {
         //移动时间设置，时间增量为delta
-        if (pFsm.m_StateTimer < 0.8f)
-            this.transform.position = Vector3.Lerp(this.transform.position, endpos, pFsm.m_StateTimer);
-        else  pFsm.SetState(PlayerState.Idle);
+        if (pFsm.m_StateTimer < 0.8f) 
+             this.transform.position = Vector3.Lerp(this.transform.position, endpos, pFsm.m_StateTimer);
+        else pFsm.SetState(PlayerState.Idle);
     }
     void OnWalkingExit() {
-        this.GetComponentInParent<GameModel>().playerX = (int)this.transform.position.x;
-        this.GetComponentInParent<GameModel>().playerZ = (int)this.transform.position.z;
-        //调整坐标为整数
-        transform.position = new Vector3(this.GetComponentInParent<GameModel>().playerX,
-            this.transform.position.y,this.GetComponentInParent<GameModel>().playerZ);
-
+       //调整坐标为整数
+       this.GetComponentInParent<GameModel>().playerX = (int)Math.Round(this.transform.position.x, MidpointRounding.AwayFromZero);
+       this.GetComponentInParent<GameModel>().playerZ = (int)Math.Round(this.transform.position.z, MidpointRounding.AwayFromZero);
+       transform.position = new Vector3(this.GetComponentInParent<GameModel>().playerX,
+       this.transform.position.y,this.GetComponentInParent<GameModel>().playerZ);
     }
 }

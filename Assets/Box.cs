@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class Box : MonoBehaviour {
 
@@ -18,8 +19,8 @@ public class Box : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
-	}
+        bFsm.UpdateState(2 * Time.deltaTime);
+    }
     void OnIdleEnter(object param) { Debug.Log("Box enter Idle"); }
     void OnIdleExit() { }
 
@@ -52,8 +53,8 @@ public class Box : MonoBehaviour {
         else bFsm.SetState(BoxState.Idle);
     }
     void OnMovingExit() {
-        int X= (int)this.transform.position.x;
-        int Z= (int)this.transform.position.z;
+        int X= (int)Math.Round(this.transform.position.x, MidpointRounding.AwayFromZero);
+        int Z= (int)Math.Round(this.transform.position.z, MidpointRounding.AwayFromZero);
         //调整坐标为整数
         transform.position = new Vector3(X, this.transform.position.y, Z);
     }
