@@ -11,6 +11,7 @@ public class GameController : MonoBehaviour {
     GameObject textUI;
     bool[,] boxPos;
     int score;
+    int moves;
     int chessLength;
     int chessWidth;
 
@@ -29,13 +30,15 @@ public class GameController : MonoBehaviour {
         destGroup = GameObject.FindGameObjectsWithTag("Destination");
         textUI = GameObject.Find("Text");
         boxToMove = null;
-        
+
         //判断
-        InvokeRepeating("judgeWin", 1, 1);
+        moves = 0;
+        //InvokeRepeating("judgeWin", 1, 1);
     }
 
 	// Update is called once per frame
 	void Update () {
+        judgeWin();
         getInput();
     }
     //输入控制
@@ -60,6 +63,7 @@ public class GameController : MonoBehaviour {
                             {
                                 boxToMove = hit.collider.gameObject;
                                 player.GetComponent<Player>().pFsm.SetState(Player.PlayerState.Walking, msg);
+                                moves++;
                                 boxToMove.GetComponent<Box>().bFsm.SetState(Box.BoxState.Moving,msg);
                                 boxPos[(int)(chessWidth - player.transform.position.z - 2), (int)player.transform.position.x] = false;
                                 boxPos[(int)(chessWidth - player.transform.position.z - 3), (int)player.transform.position.x] = true;
@@ -69,6 +73,7 @@ public class GameController : MonoBehaviour {
                 else {
                     //不相邻，直接移动
                     player.GetComponent<Player>().pFsm.SetState(Player.PlayerState.Walking, msg);
+                    moves++;
                 }
             }
         }
@@ -91,6 +96,7 @@ public class GameController : MonoBehaviour {
                             {
                                 boxToMove = hit.collider.gameObject;
                                 player.GetComponent<Player>().pFsm.SetState(Player.PlayerState.Walking, msg);
+                                moves++;
                                 boxToMove.GetComponent<Box>().bFsm.SetState(Box.BoxState.Moving, msg);
                                 boxPos[(int)(chessWidth - player.transform.position.z ), (int)player.transform.position.x] = false;
                                 boxPos[(int)(chessWidth - player.transform.position.z +1), (int)player.transform.position.x] = true;
@@ -101,6 +107,7 @@ public class GameController : MonoBehaviour {
                 {
                     //不相邻，直接移动
                     player.GetComponent<Player>().pFsm.SetState(Player.PlayerState.Walking, msg);
+                    moves++;
                 }
             }
         }
@@ -122,6 +129,7 @@ public class GameController : MonoBehaviour {
                             {
                                 boxToMove = hit.collider.gameObject;
                                 player.GetComponent<Player>().pFsm.SetState(Player.PlayerState.Walking, msg);
+                                moves++;
                                 boxToMove.GetComponent<Box>().bFsm.SetState(Box.BoxState.Moving, msg);
                                 boxPos[(int)(chessWidth - player.transform.position.z - 1), (int)(player.transform.position.x - 1 )] = false;
                                 boxPos[(int)(chessWidth - player.transform.position.z - 1), (int)(player.transform.position.x - 2 )] = true;
@@ -132,6 +140,7 @@ public class GameController : MonoBehaviour {
                 {
                     //不相邻，直接移动
                     player.GetComponent<Player>().pFsm.SetState(Player.PlayerState.Walking, msg);
+                    moves++;
                 }
             }
         }
@@ -154,6 +163,7 @@ public class GameController : MonoBehaviour {
                                 boxToMove = hit.collider.gameObject;
                                 //玩家移动
                                 player.GetComponent<Player>().pFsm.SetState(Player.PlayerState.Walking, msg);
+                                moves++;
                                 //box移动
                                 boxToMove.GetComponent<Box>().bFsm.SetState(Box.BoxState.Moving, msg);
                                 boxPos[(int)(chessWidth - player.transform.position.z - 1), (int)(player.transform.position.x + 1)] = false;
@@ -165,6 +175,7 @@ public class GameController : MonoBehaviour {
                 {
                     //不相邻or不在边界，玩家移动
                     player.GetComponent<Player>().pFsm.SetState(Player.PlayerState.Walking, msg);
+                    moves++;
                 }
             }
         }
@@ -182,7 +193,7 @@ public class GameController : MonoBehaviour {
                   && b.transform.position.z < d.transform.position.z + 0.5)
                     score++;
             }
-        textUI.GetComponent<Text>().text = "Box Num:  "+boxGroup.Length+"\nScore:  "+score;
+        textUI.GetComponent<Text>().text = "Moves Count:  "+ moves +"\nBox Num:  "+boxGroup.Length+"\nScore:  "+score;
         if (score == boxGroup.Length)
             textUI.GetComponent<Text>().text = textUI.GetComponent<Text>().text+ "\n (￣3￣) YOU WIN";
     }

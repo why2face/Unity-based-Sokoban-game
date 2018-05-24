@@ -19,7 +19,7 @@ public class Box : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        bFsm.UpdateState(2 * Time.deltaTime);
+        bFsm.UpdateState(3 * Time.deltaTime);
     }
     void OnIdleEnter(object param) { Debug.Log("Box enter Idle"); }
     void OnIdleExit() { }
