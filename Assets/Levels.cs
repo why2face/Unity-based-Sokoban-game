@@ -8,12 +8,12 @@ public enum TileTypes
     Empty = 0,
     Box = 1,
     BoxOnTarget = 2,
-    cell = 3,
+    Cell = 3,
     PlayerStart = 4,
     PlayerOnTarget = 5,
     Target = 6,
     Wall = 7
-}
+}  
 
 public static class Symbols
 {

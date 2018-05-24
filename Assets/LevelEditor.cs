@@ -9,30 +9,26 @@ using UnityEditor;
 [CustomEditor(typeof(Levels))]
 public class LevelEditor : Editor {
     Levels targetLevels;
-    //图形界面
     GUISkin skin;
     //界面是否折叠
     bool foldTex = false;
     bool foldPrefab = false;
     bool foldLevels = false;
+    // 默认单元 cell(地板)
+    TileTypes tileTypes = TileTypes.Cell;
 
-    TileTypes tileTypes = TileTypes.cell;
-
-	// Use this for initialization
-	void Start () {
-	
-	}
-
-    //设置默认皮肤
+    //用一组button表示地图单元
     void SetupSkin()
     {
         if (skin == null)
-            skin = ScriptableObject.CreateInstance(typeof(GUISkin)) as GUISkin;
+            skin = (GUISkin)ScriptableObject.CreateInstance(typeof(GUISkin));
+        //border 边界 padding margin 偏移
         skin.button.border = new RectOffset(0, 0, 0, 0);
         skin.button.padding = new RectOffset(0, 0, 0, 0);
         skin.button.margin = new RectOffset(0, 0, 0, 0);
-        skin.button.fixedHeight = 24;
-        skin.button.fixedWidth = 24;
+        //单元长宽
+        skin.button.fixedHeight = 30;
+        skin.button.fixedWidth = 30;
         skin.button.stretchHeight = true;
         skin.button.stretchWidth = true;
     }
@@ -60,10 +56,10 @@ public class LevelEditor : Editor {
         foldPrefab = EditorGUILayout.Foldout(foldPrefab, "Prefabs");
         if (foldPrefab){
             targetLevels.PlayerPrefab = EditorGUILayout.ObjectField("Player Prefab", targetLevels.PlayerPrefab, typeof(GameObject), false) as GameObject;
-            targetLevels.BoxPrefab = EditorGUILayout.ObjectField("Crate Prefab", targetLevels.BoxPrefab, typeof(GameObject), false) as GameObject;
+            targetLevels.BoxPrefab = EditorGUILayout.ObjectField("Box Prefab", targetLevels.BoxPrefab, typeof(GameObject), false) as GameObject;
             targetLevels.TargetPrefab = EditorGUILayout.ObjectField("Target Prefab", targetLevels.TargetPrefab, typeof(GameObject), false) as GameObject;
             targetLevels.WallPrefab = EditorGUILayout.ObjectField("Wall Prefab", targetLevels.WallPrefab, typeof(GameObject), false) as GameObject;
-            targetLevels.CellPrefab = EditorGUILayout.ObjectField("Ground Prefab", targetLevels.CellPrefab, typeof(GameObject), false) as GameObject;
+            targetLevels.CellPrefab = EditorGUILayout.ObjectField("Cell Prefab", targetLevels.CellPrefab, typeof(GameObject), false) as GameObject;
         }
         //EditorGUILayout.Separator();
         foldLevels = EditorGUILayout.Foldout(foldLevels, "Stage List");
@@ -73,55 +69,101 @@ public class LevelEditor : Editor {
             foreach (Level lvl in levels){
                 EditorGUI.indentLevel++;
                 lvl.foldout = EditorGUILayout.Foldout(lvl.foldout, "Level " + i);
-                if (lvl.foldout)
-                {
+                if (lvl.foldout){
                     EditorGUILayout.Separator();
                     EditorGUILayout.BeginHorizontal();
                     // 移除关卡 按钮
                     bool removeButton = GUILayout.Button("Remove", GUILayout.Width(80.0f));
-                    if (removeButton)
-                    {
+                    if (removeButton){
                         levels.Remove(lvl);
                         EditorGUILayout.EndHorizontal();
                         break;
                     }
                     // 加载关卡 按钮
                     bool loadButton = GUILayout.Button("Load Stage", GUILayout.Width(80.0f));
-                    if (loadButton) {
-                        //*********************待实现
-                        //clear() 清空全图 
-                        //读取关卡
-                        //*********************待实现
+                    if (loadButton){
+                        ClearStage();
+                        GameObject temp;
+                        for (int _y = 0; _y < lvl.SizeY; _y++) {
+                            for (int _x = 0; _x < lvl.SizeX; _x++) {
+                                //当前单元
+                                char s = lvl.levelDef[_x * lvl.SizeY + _y][0];
+                                switch (SymbolToState(s)) { 
+                                    case (int)TileTypes.Box:
+                                        temp = Instantiate(targetLevels.CellPrefab, _y, 0, _x);
+                                        temp.transform.parent = GameObject.Find("Grounds").transform;
+                                        temp = Instantiate(targetLevels.BoxPrefab, _y, 0.5f, _x);
+                                        temp.transform.parent = GameObject.Find("Boxes").transform;
+                                        break;
+                                    case (int)TileTypes.BoxOnTarget:
+                                        temp = Instantiate(targetLevels.TargetPrefab, _y, 0, _x);
+                                        temp.transform.parent = GameObject.Find("Targets").transform;
+                                        break;
+                                    case (int)TileTypes.Cell:
+                                        temp = Instantiate(targetLevels.CellPrefab, _y, 0, _x);
+                                        temp.transform.parent = GameObject.Find("Grounds").transform;
+                                        break;
+                                    case (int)TileTypes.PlayerStart:
+                                        temp = Instantiate(targetLevels.CellPrefab, _y, 0, _x);
+                                        temp.transform.parent = GameObject.Find("Grounds").transform;
+                                        temp = Instantiate(targetLevels.PlayerPrefab, _y, 0.8f, _x);
+                                        break;
+                                    case (int)TileTypes.PlayerOnTarget:
+                                        temp = Instantiate(targetLevels.TargetPrefab, _y, 0, _x);
+                                        temp.transform.parent = GameObject.Find("Targets").transform;
+                                        temp = Instantiate(targetLevels.PlayerPrefab, _y, 0.8f, _x);
+                                        break;
+                                    case (int)TileTypes.Wall:
+                                        temp = Instantiate(targetLevels.WallPrefab, _y, 0, _x);
+                                        temp.transform.parent = GameObject.Find("Walls").transform;
+                                        break;
+                                    case (int)TileTypes.Target:
+                                        temp = Instantiate(targetLevels.TargetPrefab, _y, 0, _x);
+                                        temp.transform.parent = GameObject.Find("Targets").transform;
+                                        break;
+                                }
+                            }
+                        }
                     }
                     EditorGUILayout.EndHorizontal();
                     // 地图长宽 输入框
                     EditorGUILayout.BeginHorizontal();
-                    EditorGUILayout.LabelField("Size:", GUILayout.Width(80.0f));
+                    EditorGUILayout.LabelField("Size (X * Y):", GUILayout.Width(90.0f));
                     lvl.SizeX = EditorGUILayout.IntField(lvl.SizeX, GUILayout.Width(48.0f));
                     lvl.SizeY = EditorGUILayout.IntField(lvl.SizeY, GUILayout.Width(48.0f));
                     EditorGUILayout.EndHorizontal();
-                    // 使用一个字符串数组存放地图布局 size = sizeX*sizeY
+
+                    // 使用一个字符数组存放地图布局 size = sizeX*sizeY
                     if (lvl.levelDef == null)
                         lvl.levelDef = new string[0];
                     Array.Resize(ref lvl.levelDef, lvl.SizeX * lvl.SizeY);
-
+                    // 显示字符数组
+                    EditorGUILayout.LabelField("Level Definition:");
+                    for (int m = 0; m < lvl.SizeY; m++) {
+                        EditorGUILayout.BeginHorizontal();
+                        for (int n = 0; n < lvl.SizeX; n++) {
+                            EditorGUILayout.LabelField(lvl.levelDef[n * lvl.SizeY + m],
+                                GUILayout.Width(30.0f));
+                        }
+                        EditorGUILayout.EndHorizontal();
+                    }
+                    EditorGUILayout.Separator();
                     // 单元格类型 枚举列表
                     EditorGUILayout.BeginHorizontal();
                     tileTypes = (TileTypes)EditorGUILayout.EnumPopup("Unit Type", tileTypes);
                     EditorGUILayout.EndHorizontal();
                     EditorGUILayout.Separator();
-
                     //地图单元编辑
                     for (int _y = 0; _y < lvl.SizeY; _y++){
                         EditorGUILayout.BeginHorizontal();
                         for (int _x = 0; _x < lvl.SizeX; _x++){
                             int index = _x * lvl.SizeY + _y;
-                            //初始化 默认全部单元为empty,再尝试读取各单元的定义
+                            // 初始化 默认全部单元为empty,再尝试读取各单元的定义
                             char chr = ' ';
                             try{
                                 chr = lvl.levelDef[index][0];
                             }catch{ }
-
+                            // buttonState：单元(_x,_y)的类型索引
                             int buttonState = SymbolToState(chr);                      
                             Texture2D texture = null;
                             switch (buttonState){
@@ -183,6 +225,14 @@ public class LevelEditor : Editor {
         }
         EditorGUILayout.EndVertical();
         EditorUtility.SetDirty(targetLevels);
+
+        //清空场景
+        EditorGUILayout.Separator();
+        EditorGUILayout.BeginHorizontal();
+        bool clearButton = GUILayout.Button("Clear Stage", GUILayout.Width(80.0f));
+        if (clearButton)
+            ClearStage();
+        EditorGUILayout.EndHorizontal();
     }
 
     //在坐标(x,y,z)实例化物体
@@ -214,5 +264,17 @@ public class LevelEditor : Editor {
         return Symbols.symbols[state];
     }
 
+    public void ClearStage() {
+        foreach (GameObject obj in GameObject.FindGameObjectsWithTag("Player"))
+            DestroyImmediate(obj);
+        foreach (GameObject obj in GameObject.FindGameObjectsWithTag("Box"))
+            DestroyImmediate(obj);
+        foreach (GameObject obj in GameObject.FindGameObjectsWithTag("Cell"))
+            DestroyImmediate(obj);
+        foreach (GameObject obj in GameObject.FindGameObjectsWithTag("Wall"))
+            DestroyImmediate(obj);
+        foreach (GameObject obj in GameObject.FindGameObjectsWithTag("Destination"))
+            DestroyImmediate(obj);
+    }
    
 }

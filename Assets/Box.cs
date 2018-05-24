@@ -16,17 +16,17 @@ public class Box : MonoBehaviour {
         bFsm.RegistState(BoxState.Moving, OnMovingEnter, OnMovingUpdate, OnMovingExit);
         bFsm.SetState(BoxState.Idle);	
 	}
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update() {
         bFsm.UpdateState(3 * Time.deltaTime);
     }
-    void OnIdleEnter(object param) { Debug.Log("Box enter Idle"); }
+    void OnIdleEnter(object param) { }//Debug.Log("Box enter Idle"); }
     void OnIdleExit() { }
 
     void OnMovingEnter(object param)
     {
-        Debug.Log("Box enter Moving");
+        //Debug.Log("Box enter Moving");
         switch (param.ToString())
         {
             case "W":

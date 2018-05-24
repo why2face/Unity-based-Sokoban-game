@@ -21,12 +21,12 @@ public class Player : MonoBehaviour {
 	void Update () {
         pFsm.UpdateState(3 * Time.deltaTime);
     }
-    void OnIdleEnter(object param) { Debug.Log("Player enter Idle"); }
+    void OnIdleEnter(object param) { }//Debug.Log("Player enter Idle"); 
     void OnIdleExit() { }
 
     void OnWalkingEnter(object param)
     {
-        Debug.Log("Player enter Walking");
+        //Debug.Log("Player enter Walking");
         switch (param.ToString()) {
             case "W":
                 endpos = new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z + 1);
@@ -52,10 +52,13 @@ public class Player : MonoBehaviour {
         else pFsm.SetState(PlayerState.Idle);
     }
     void OnWalkingExit() {
-       //调整坐标为整数
-       this.GetComponentInParent<GameModel>().playerX = (int)Math.Round(this.transform.position.x, MidpointRounding.AwayFromZero);
-       this.GetComponentInParent<GameModel>().playerZ = (int)Math.Round(this.transform.position.z, MidpointRounding.AwayFromZero);
-       transform.position = new Vector3(this.GetComponentInParent<GameModel>().playerX,
-       this.transform.position.y,this.GetComponentInParent<GameModel>().playerZ);
+        //调整坐标为整数
+        //this.GetComponentInParent<GameModel>().playerX = (int)Math.Round(this.transform.position.x, MidpointRounding.AwayFromZero);
+        //this.GetComponentInParent<GameModel>().playerZ = (int)Math.Round(this.transform.position.z, MidpointRounding.AwayFromZero);
+        //transform.position = new Vector3(this.GetComponentInParent<GameModel>().playerX,
+        //this.transform.position.y,this.GetComponentInParent<GameModel>().playerZ);
+        int _x = (int)Math.Round(this.transform.position.x, MidpointRounding.AwayFromZero);
+        int _z = (int)Math.Round(this.transform.position.z, MidpointRounding.AwayFromZero);
+        transform.position = new Vector3(_x, this.transform.position.y,_z);
     }
 }

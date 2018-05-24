@@ -31,10 +31,9 @@ public class Level : ScriptableObject{
         }
     }
 
-    // 地图布局定义 用字符矩阵表示
+    // 地图布局定义 用字符数组表示
     [SerializeField]
     public string[] levelDef;
-    // UI：是否折叠
     [SerializeField]
     public bool foldout;
 }
