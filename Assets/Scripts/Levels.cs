@@ -34,6 +34,7 @@ public static class Symbols
 public class Levels : MonoBehaviour {
     //关卡列表
     public List<Level> levels;
+    public int CurrentLevel;
     //预置体列表
     public GameObject PlayerPrefab;
     public GameObject BoxPrefab;

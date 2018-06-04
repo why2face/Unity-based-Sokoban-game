@@ -12,9 +12,9 @@ public class CameraController : MonoBehaviour {
 
     void LateUpdate()
     {
-        //目标物体要到达的目标位置 = 当前物体的位置 + 当前摄像机的位置  
+        //摄像机的目标位置 = 目标物体的坐标 + 摄像机的固定坐标  
         Vector3 targetPos = playerTransform.position + new Vector3(0, 6, -4);
-        //使用线性插值计算让摄像机用smoothing * Time.deltaTime时间从当前位置到移动到目标位置  
+        //线性插值 移动到目标位置  
         this.transform.position = Vector3.Lerp(this.transform.position, targetPos, movespeed * Time.deltaTime);
     }
 }

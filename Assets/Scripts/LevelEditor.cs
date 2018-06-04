@@ -16,8 +16,7 @@ public class LevelEditor : Editor {
     bool foldLevels = false;
     // 默认单元 cell(地板)
     TileTypes tileTypes = TileTypes.Cell;
-
-    //用一组button表示地图单元
+    //用button表示地图单元
     void SetupSkin()
     {
         if (skin == null)
@@ -82,6 +81,7 @@ public class LevelEditor : Editor {
                     // 加载关卡 按钮
                     bool loadButton = GUILayout.Button("Load Stage", GUILayout.Width(80.0f));
                     if (loadButton){
+                        targetLevels.CurrentLevel = i;
                         ClearStage();
                         GameObject temp;
                         for (int _y = 0; _y < lvl.SizeY; _y++) {

@@ -53,7 +53,7 @@ public class PlayerState : MonoBehaviour {
     }
 
     /// <summary>
-    /// 移动动画 协程
+    /// 移动
     /// </summary>
     /// <returns></returns>
     public IEnumerator moveAnimation() {
