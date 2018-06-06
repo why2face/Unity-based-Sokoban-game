@@ -1,4 +1,4 @@
-﻿namespace PanJanek.SokobanSolver.Sokoban
+﻿namespace SokobanSolver.Sokoban
 {
     public static class Constants
     {

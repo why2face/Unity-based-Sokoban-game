@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace PanJanek.SokobanSolver.Engine
+namespace SokobanSolver.Engine
 {
     public interface IGamePosition
     {

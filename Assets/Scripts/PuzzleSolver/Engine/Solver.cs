@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace PanJanek.SokobanSolver.Engine
+namespace SokobanSolver.Engine
 {
     public class Solver<T> where T : IGamePosition
     {

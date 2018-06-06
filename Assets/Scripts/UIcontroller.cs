@@ -2,10 +2,11 @@
 using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
-using PanJanek.SokobanSolver.Sokoban;
-using PanJanek.SokobanSolver.Engine;
+using SokobanSolver.Sokoban;
+using SokobanSolver.Engine;
 using System.IO;
 using System;
+using UnityEngine.SceneManagement;
 
 public class UIcontroller : MonoBehaviour {
     GameObject UItext;
@@ -33,10 +34,12 @@ public class UIcontroller : MonoBehaviour {
         BoxNum = AllBox.Length;
         TargetNum = AllTarget.Length;
         moves = 0;
+        UItext.GetComponent<Text>().text = "Moves Count:  " + moves + "\nBox Num:  " + AllBox.Length + "\nScore:  " + score;
         //按钮事件 解题
-        Button btn = GameObject.Find("UI/Button1").GetComponent<Button>();
-        btn.onClick.AddListener(SolveListener);
-
+        Button solveBtn = GameObject.Find("UI/Button1").GetComponent<Button>();
+        solveBtn.onClick.AddListener(SolveListener);
+        Button refreshBtn = GameObject.Find("UI/Button3").GetComponent<Button>();
+        refreshBtn.onClick.AddListener(RefreshListener);
     }
 	
 	// Update is called once per frame
@@ -72,9 +75,13 @@ public class UIcontroller : MonoBehaviour {
         var position = SokobanPosition.LoadFromFile("temp.txt");
         var solver = new Solver<SokobanPosition>();
         Solution<SokobanPosition> solution = solver.AStar(position);
-        if (solution.FinalPosition != null) {
+        if (solution.FinalPosition != null)
+        {
             path = SokobanUtil.GetFullPath(solution.GetPath().ToArray());
-            SolveText.GetComponent<Text>().text = "Solution: " + path;
+            SolveText.GetComponent<Text>().text = "Solution: \n" + path;
+        }
+        else {
+            SolveText.GetComponent<Text>().text = "Solution not found.";
         }
         //按钮 播放动画 ↑↓←→
         Button btn2 = GameObject.Find("UI/Button2").GetComponent<Button>();
@@ -94,8 +101,7 @@ public class UIcontroller : MonoBehaviour {
                 if (Physics.Raycast(player.transform.position, Vector3.forward, out hit, 1))
                 {
                     if (hit.collider.gameObject.tag == "Wall")
-                    {
-                        //撞墙 返回
+                    {  //撞墙 返回
                         yield return null;
                     }
                     else if (hit.collider.gameObject.tag == "Box")
@@ -158,8 +164,7 @@ public class UIcontroller : MonoBehaviour {
                 if (Physics.Raycast(player.transform.position, Vector3.left, out hit, 1))
                 {
                     if (hit.collider.gameObject.tag == "Wall")
-                    {
-                        yield return null;
+                    {   yield return null;
                     }
                     else if (hit.collider.gameObject.tag == "Box")
                     {
@@ -188,8 +193,7 @@ public class UIcontroller : MonoBehaviour {
                 if (Physics.Raycast(player.transform.position, Vector3.right, out hit, 1))
                 {
                     if (hit.collider.gameObject.tag == "Wall")
-                    {
-                        yield return null;
+                    {   yield return null;
                     }
                     else if (hit.collider.gameObject.tag == "Box")
                     {
@@ -213,10 +217,13 @@ public class UIcontroller : MonoBehaviour {
                 }
             }
             //暂停一秒后继续执行for循环
-            yield return new WaitForSeconds(1f); ;
+            yield return new WaitForSeconds(0.5f) ;
         }
     }
 
+    void RefreshListener() {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
     //得分判断
     void JudegeWin() {
         score = 0;

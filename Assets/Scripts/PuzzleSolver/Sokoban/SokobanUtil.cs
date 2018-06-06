@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace PanJanek.SokobanSolver.Sokoban
+namespace SokobanSolver.Sokoban
 {
     public static class SokobanUtil
     {

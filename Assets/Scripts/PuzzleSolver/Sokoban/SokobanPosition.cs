@@ -1,11 +1,12 @@
-﻿using PanJanek.SokobanSolver.Engine;
+﻿using SokobanSolver.Engine;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 
-namespace PanJanek.SokobanSolver.Sokoban
+namespace SokobanSolver.Sokoban
 {
     public class SokobanPosition : IGamePosition
     {
@@ -103,7 +104,7 @@ namespace PanJanek.SokobanSolver.Sokoban
 
             if (stones.Count != goals.Count)
             {
-                throw new Exception("Number of stones is not equal to numer of goals!"); 
+                Debug.Log("! 箱子数量与目标点数量不符 !"); 
             }
 
             position.Goals = goals.ToArray();
@@ -485,7 +486,7 @@ namespace PanJanek.SokobanSolver.Sokoban
                         PointXY g;
                         g.X = x;
                         g.Y = y;
-                        goals.Add(g);
+                        goals.Add(g); 
                     }
 
                     this.DeadlockMap[x, y] = true;
